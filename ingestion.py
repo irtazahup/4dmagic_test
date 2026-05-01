@@ -1,7 +1,7 @@
 import uuid
 import time
 from typing import List
-
+import time
 from pinecone import Pinecone
 from huggingface_hub import InferenceClient
 from langchain_community.document_loaders import PyPDFLoader
@@ -29,6 +29,7 @@ BATCH_SIZE = 50
 def ingest_pdf(file_path: str):
 
     document_id = str(uuid.uuid4())
+    timestamp = time.time()
 
     # ✅ Load PDF
     loader = PyPDFLoader(file_path)
@@ -52,12 +53,13 @@ def ingest_pdf(file_path: str):
         texts.append(doc.page_content)
 
         metadatas.append({
-        "text": doc.page_content,   # 🔥 THIS IS MISSING
-        "source": os.path.basename(file_path),
+    "text": doc.page_content,
+    "source": os.path.basename(file_path),
     "chunk_index": i,
     "page": doc.metadata.get("page", None),
-        "document_id": document_id
-        })
+    "document_id": document_id,
+    "timestamp": timestamp   # 🔥 ADD THIS
+})
 
     # ✅ Batch Embedding + Upsert
     for i in range(0, len(texts), BATCH_SIZE):
