@@ -1,22 +1,32 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
+import os
+import shutil
+
+from ingestion import ingest_pdf
 
 app = FastAPI()
+
+UPLOAD_DIR = "uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
 @app.post("/upload-pdf/")
 async def upload_pdf(file: UploadFile = File(...)):
-    
-    # ✅ Check file type
+
     if file.content_type != "application/pdf":
-        raise HTTPException(status_code=400, detail="Only PDF files are allowed")
+        raise HTTPException(status_code=400, detail="Only PDF allowed")
 
     try:
-        # ✅ Read file (optional: save or process later)
-        content = await file.read()
+        file_path = os.path.join(UPLOAD_DIR, file.filename)
+
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+
+        document_id, chunk_count = ingest_pdf(file_path)
 
         return {
-            "filename": file.filename,
-            "message": "PDF uploaded successfully"
+            "document_id": document_id,
+            "chunks_stored": chunk_count
         }
 
     except Exception as e:
