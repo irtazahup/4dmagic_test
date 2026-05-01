@@ -1,0 +1,48 @@
+Answer 1 :
+
+I would go for Overlapping chuncking 
+and for 40 page pdf we can have chuck size of 500 tokens
+
+note: if the pdf has financial data or hirerchical data i can go with page-index 
+
+
+Answer 2:
+
+for a personalize chatbot type application like asking queries related to personal data we will use embeddings to get the semantics of the query and the retreived text,
+
+for simple Db query like finding emails,phone numbers we will use keyword search 
+
+dense retrieval outperform when there is need to understanding the semantics (like car and vehicle) 
+keyword searching is when the searching is kind of deterministic like finding emails or phone numbers ect(we can use dense but there will be lose of computation
+
+
+
+
+Answer 3:
+
+win vanilla rag we find top-k similar items, now problem is if there is even 0.001 similarity found in top-k sample it will return it and combine that with user query and send it to LLm 
+
+to mitigate this before deployment we will use REcall (relevant retrieve/ total retrieve), and in prod , we need thresholding(if similarity > X),  we will also add some guardrills like forcing to ask for cross check .
+
+the API should retrun the response 
+
+
+Answer 4:
+
+when i asked to create an endpoint that take the pdf and converts it to chucnks it gave me simple code but it should have give me the prerequisite like , using a Markdown parser (like LlamaParse) before chunking. This converts tables into Markdown text, which handles 500-token splits much more gracefully than raw text.
+
+
+
+
+
+answer 5:
+
+Auto Scaling(horizontal would be preferred) with load balancer , and queues for workers.
+
+
+
+
+
+
+
+
