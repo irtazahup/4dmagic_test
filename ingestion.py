@@ -52,10 +52,11 @@ def ingest_pdf(file_path: str):
         texts.append(doc.page_content)
 
         metadatas.append({
-            "source": os.path.basename(file_path),
-            "chunk_index": i,
-            "page": doc.metadata.get("page", None),
-            "document_id": document_id
+        "text": doc.page_content,   # 🔥 THIS IS MISSING
+        "source": os.path.basename(file_path),
+    "chunk_index": i,
+    "page": doc.metadata.get("page", None),
+        "document_id": document_id
         })
 
     # ✅ Batch Embedding + Upsert
