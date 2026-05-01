@@ -1,0 +1,9 @@
+
+huggingface_hub
+
+python-dotenv
+pinecone
+fastapi
+uvicorn
+groq
+numpy
