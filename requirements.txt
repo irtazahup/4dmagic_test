@@ -7,3 +7,5 @@ fastapi
 uvicorn
 groq
 numpy
+PyPDF2
+sentence-transformers
