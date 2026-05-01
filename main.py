@@ -8,6 +8,7 @@ from ingestion import ingest_pdf
 from embedding import get_embedding
 from retrievel import retrieve_context
 from generator import generate_answer
+from helper import compute_confidence
 
 app = FastAPI()
 
@@ -43,16 +44,34 @@ async def upload_pdf(file: UploadFile = File(...)):
 @app.post("/chat")
 async def chat(request: ChatRequest):
 
-    # 1️⃣ Embedding
+    # 1. Embed question
     vector = get_embedding(request.question)
 
-    # 2️⃣ Retrieval
-    context = retrieve_context(vector)
+    # 2. Retrieve structured chunks
+    chunks = retrieve_context(vector)
 
-    # 3️⃣ Generation
-    answer = generate_answer(request.question, context)
+    # 3. NOT FOUND HANDLING (VERY IMPORTANT)
+    if not chunks:
+        return {
+            "answer": "I don't know based on the provided documents.",
+            "sources": [],
+            "confidence": 0.0
+        }
 
+    # 4. Generate answer
+    answer = generate_answer(request.question, chunks)
+
+    # 5. Detect hallucination guard
+    if "NOT_FOUND" in answer:
+        return {
+            "answer": "I don't know based on the provided documents.",
+            "sources": chunks,
+            "confidence": compute_confidence(chunks)
+        }
+
+    # 6. Final response
     return {
         "answer": answer,
-        "source_context": context
+        "sources": chunks,
+        "confidence": compute_confidence(chunks)
     }

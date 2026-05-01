@@ -5,7 +5,6 @@ pc = Pinecone(api_key=settings.PINECONE_API_KEY)
 index = pc.Index(settings.INDEX_NAME)
 
 def retrieve_context(vector, top_k=3):
-  
     results = index.query(
         vector=vector,
         top_k=top_k,
@@ -14,10 +13,16 @@ def retrieve_context(vector, top_k=3):
 
     matches = results.get("matches", [])
 
-    context = "\n".join([
-        match.get("metadata", {}).get("text", "")
-        for match in matches
-        if match.get("metadata")
-    ])
+    structured_chunks = []
 
-    return context.strip()
+    for m in matches:
+        meta = m.get("metadata", {})
+
+        structured_chunks.append({
+            "score": m.get("score"),
+            "document": meta.get("source", "unknown"),
+            "text": meta.get("text", ""),
+            "page": meta.get("page", None)
+        })
+
+    return structured_chunks
