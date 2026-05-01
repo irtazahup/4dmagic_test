@@ -13,6 +13,7 @@ from helper import compute_confidence
 from collections import defaultdict
 from datetime import datetime
 from config import settings
+from local_db import load_db
 
 app = FastAPI()
 pc = Pinecone(api_key=settings.PINECONE_API_KEY)
@@ -84,46 +85,19 @@ async def chat(request: ChatRequest):
 
 @app.get("/documents")
 def get_documents():
-   
-    # dummy vector (required by Pinecone)
-    dummy_vector = [0.0] * 384  
 
-    results = index.query(
-        vector=dummy_vector,
-        top_k=10000,
-        include_metadata=True
-    )
+    db = load_db()
 
-    docs = defaultdict(lambda: {
-        "document_id": "",
-        "filename": "",
-        "chunk_count": 0,
-        "timestamp": 0
-    })
-
-    for match in results["matches"]:
-        meta = match.get("metadata", {})
-
-        doc_id = meta.get("document_id")
-
-        if not doc_id:
-            continue
-
-        docs[doc_id]["document_id"] = doc_id
-        docs[doc_id]["filename"] = meta.get("source", "unknown")
-        docs[doc_id]["chunk_count"] += 1
-        docs[doc_id]["timestamp"] = meta.get("timestamp", 0)
-
-    # convert to list
     response = []
 
-    for d in docs.values():
+    for doc_id, data in db.items():
         response.append({
-            "document_id": d["document_id"],
-            "filename": d["filename"],
-            "chunk_count": d["chunk_count"],
-            "timestamp": datetime.fromtimestamp(d["timestamp"]).isoformat()
-            if d["timestamp"] else None
+            "document_id": doc_id,
+            "filename": data["filename"],
+            "chunk_count": data["chunk_count"],
+            "timestamp": datetime.fromtimestamp(
+                data["timestamp"]
+            ).isoformat()
         })
 
     return response

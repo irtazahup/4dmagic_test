@@ -6,6 +6,7 @@ from pinecone import Pinecone
 from huggingface_hub import InferenceClient
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_classic.text_splitter import RecursiveCharacterTextSplitter
+from local_db import add_document
 
 import os
 from dotenv import load_dotenv
@@ -89,5 +90,10 @@ def ingest_pdf(file_path: str):
         except Exception as e:
             print(f"Error in batch {i}: {e}")
             continue
+        add_document(
+    document_id,
+    os.path.basename(file_path),
+    total_chunks
+    )
 
     return document_id, total_chunks
