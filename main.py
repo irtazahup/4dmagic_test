@@ -13,7 +13,7 @@ from helper import compute_confidence
 from collections import defaultdict
 from datetime import datetime
 from config import settings
-from local_db import load_db
+from local_db import load_db,delete_document
 
 app = FastAPI()
 pc = Pinecone(api_key=settings.PINECONE_API_KEY)
@@ -101,3 +101,34 @@ def get_documents():
         })
 
     return response
+
+
+
+
+@app.delete("/documents/{doc_id}")
+def delete_document_api(doc_id: str):
+
+    # 1️⃣ Delete from Pinecone
+    try:
+        index.delete(
+            filter={"document_id": doc_id}
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Pinecone delete failed: {str(e)}"
+        )
+
+    # 2️⃣ Delete from local DB
+    removed = delete_document(doc_id)
+
+    if not removed:
+        raise HTTPException(
+            status_code=404,
+            detail="Document not found in local DB"
+        )
+
+    return {
+        "message": "Document deleted successfully",
+        "document_id": doc_id
+    }

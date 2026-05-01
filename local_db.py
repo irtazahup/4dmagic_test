@@ -37,3 +37,14 @@ def add_document(doc_id, filename, chunk_count):
     }
 
     save_db(db)
+    
+    
+def delete_document(doc_id):
+    db = load_db()
+
+    if doc_id in db:
+        del db[doc_id]
+        save_db(db)
+        return True
+
+    return False
