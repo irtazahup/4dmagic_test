@@ -1,10 +1,8 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
 import os
 import shutil
-
 from pinecone import Pinecone
 from pydantic import BaseModel
-
 from ingestion import ingest_pdf
 from embedding import get_embedding
 from retrievel import retrieve_context
@@ -26,11 +24,12 @@ class ChatRequest(BaseModel):
     
 @app.post("/upload-pdf/")
 async def upload_pdf(file: UploadFile = File(...)):
-
+    #check if it's a PDF
     if file.content_type != "application/pdf":
         raise HTTPException(status_code=400, detail="Only PDF allowed")
 
     try:
+        # Save uploaded file
         file_path = os.path.join(UPLOAD_DIR, file.filename)
 
         with open(file_path, "wb") as buffer:

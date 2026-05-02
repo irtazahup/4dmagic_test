@@ -49,7 +49,7 @@ def ingest_pdf(file_path: str):
     # ✅ Prepare texts + metadata
     texts = []
     metadatas = []
-
+    #We structure metadata to include document_id and timestamp for better management and future features like expiration or versioning.
     for i, doc in enumerate(docs):
         texts.append(doc.page_content)
 
@@ -59,10 +59,10 @@ def ingest_pdf(file_path: str):
     "chunk_index": i,
     "page": doc.metadata.get("page", None),
     "document_id": document_id,
-    "timestamp": timestamp   # 🔥 ADD THIS
+    "timestamp": timestamp   
 })
 
-    # ✅ Batch Embedding + Upsert
+    #  Batch Embedding + Upsert
     for i in range(0, len(texts), BATCH_SIZE):
         batch_texts = texts[i:i+BATCH_SIZE]
         batch_meta = metadatas[i:i+BATCH_SIZE]
@@ -72,7 +72,7 @@ def ingest_pdf(file_path: str):
                 batch_texts,
                 model="sentence-transformers/all-MiniLM-L6-v2"
             )
-
+            # We structure the vectors with unique IDs and include metadata for each chunk. This allows us to trace back the source document and chunk information during retrieval, which is crucial for providing context in the RAG process.
             vectors = []
             for j, (vec, meta) in enumerate(zip(embeddings, batch_meta)):
                 vectors.append({

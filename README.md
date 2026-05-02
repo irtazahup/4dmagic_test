@@ -26,10 +26,9 @@ A FastAPI-based project for PDF ingestion, chunk embedding, and question-answeri
    ```powershell
    pip install -r requirements.txt
    ```
-4. Copy the example environment file:
+4. create the  environment file:
    ```powershell
-   copy .env.example .env
-   ```
+   create .env   ```
 5. Run the app:
    ```powershell
    uvicorn main:app --reload
@@ -37,12 +36,12 @@ A FastAPI-based project for PDF ingestion, chunk embedding, and question-answeri
 
 ## Environment variables
 
-Create `.env` from `.env.example` and set these values:
+Create `.env` set these values:
 
 - `PINECONE_API_KEY` - Pinecone API key
 - `INDEX_NAME` - Pinecone index name
-- `HUGGINGFACE_API_KEY` - Hugging Face API token
-- `GROQ_API_KEY` - Groq API key (optional depending on future usage)
+- `HUGGINGFACE_API_KEY` - Hugging Face API token(model:sentence-transformers/all-MiniLM-L6-v2)
+- `GROQ_API_KEY` - Groq API key (model:llama-3.1-8b-instant)
 
 ## API Endpoints
 
